@@ -4,6 +4,7 @@
 * [description](#description)
 * [quickstart](#quickstart)
 * [manage migrations](#manage-migrations)
+* [create database diagram](#create-database-diagram)
 * [how this project was built](#how-this-project-was-built)
 <!-- TOCEND -->
 
