@@ -2,7 +2,7 @@
 
 exdir=$(dirname `readlink -f "$0"`)
 
-if [ ! -e /opt/schemacrawler/_schemacrawler/schemacrawler.sh ]; then
+if [ ! -e ~/opt/schemacrawler/_schemacrawler/schemacrawler.sh ]; then
 	echo "can't find schemacrawler"
 	echo "see https://github.com/devel0/knowledge/blob/4275a7062f0126631d961afbd0c9d5b5154002d7/doc/psql-schema-crawler.md"
 	exit 1
@@ -24,9 +24,10 @@ if [ "$pgpass" == "" ]; then
 	exit 1
 fi
 
+if [ ! -e "$exdir"/doc/db ]; then mkdir -p "$exdir"/doc/db; fi
 cd "$exdir"/doc/db
 
-SC_GRAPHVIZ_OPTS='-Granksep=1.5' /opt/schemacrawler/_schemacrawler/schemacrawler.sh \
+SC_GRAPHVIZ_OPTS='-Granksep=1.5' ~/opt/schemacrawler/_schemacrawler/schemacrawler.sh \
     --log-level=SEVERE \
     --portable-names \
     --sort-columns \

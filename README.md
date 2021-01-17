@@ -80,6 +80,32 @@ notes:
 [3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/MyDbContext.cs#L174
 [4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#update-database-and-diagram
 
+## create database diagram
+
+- tune dbhost and dbname in the script
+- set auth in `~/.pgpass` like so
+
+```
+10.10.5.2:*:*:postgres:secret-pass
+```
+
+that mean to use given `secret-pass` for access when user is `postgres` for any database,port when host is `10.10.5.2`
+
+general form is
+
+```
+hostname:port:database:username:password
+```
+
+- run the tool
+
+```sh
+./gen-db-dia.sh
+```
+
+result:
+![](doc/db/db.png)
+
 ## how this project was built
 
 ```sh
