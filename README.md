@@ -14,6 +14,8 @@ example of netcore console app using efcore + psql with support for migrations b
 
 ## quickstart
 
+- tune [appname][5] used to locate `~/.config/appname/config.json` pathfilename
+
 - create a db on target
 
 - create first migration
@@ -80,6 +82,7 @@ notes:
 [2]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/types/SampleTable.cs#L18
 [3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/MyDbContext.cs#L174
 [4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#update-database-and-diagram
+[5]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/Global.cs#L40
 
 ## create database diagram
 
