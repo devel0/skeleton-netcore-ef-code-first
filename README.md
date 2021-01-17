@@ -78,7 +78,7 @@ notes:
 [1]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/Program.cs#L35
 [2]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/types/SampleTable.cs#L18
 [3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/MyDbContext.cs#L174
-[4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#L147
+[4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#update-database-and-diagram
 
 ## how this project was built
 
