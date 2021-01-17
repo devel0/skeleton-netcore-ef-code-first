@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 * [description](#description)
+* [quickstart](#quickstart)
+* [manage migrations](#manage-migrations)
 * [how this project was built](#how-this-project-was-built)
 <!-- TOCEND -->
 
@@ -60,12 +62,23 @@ new record added : {
 ```
 
 notes:
-- create timestamp recorded from code using [utc]() so that db doesn't need to store timezone
+- create timestamp recorded from code using [utc][1] so that db doesn't need to store timezone; it will recognized during [read][2]
+- update_timestamp will automatically updated at first record change through a [trigger][3]
 
 ## manage migrations
 
+- `add-migr.sh` : create new migration from current code toward db
+- `backup-migr.sh` : automatically invoked by add-migr
+- `restore-migr.sh` : if lost `Migrations` folder a restore from autoarchived db version can be done
 
+notes:
+- do not add `Migrations` to git because other deveopers may work on other stage fo migrations on other database hosts
+- [references][4]
 
+[1]: 
+[2]:
+[3]:
+[4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#L147
 
 ## how this project was built
 
