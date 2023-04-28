@@ -2,124 +2,106 @@
 
 <!-- TOC -->
 * [description](#description)
-* [quickstart](#quickstart)
-* [manage migrations](#manage-migrations)
-* [create database diagram](#create-database-diagram)
+* [prepare database context](#prepare-database-context)
+* [managing migrations](#managing-migrations)
+  + [first migrations](#first-migrations)
+  + [update database](#update-database)
+* [run the app](#run-the-app)
+* [migration tool summary](#migration-tool-summary)
+* [clean architecture](#clean-architecture)
 * [how this project was built](#how-this-project-was-built)
 <!-- TOCEND -->
 
 ## description
 
-example of netcore console app using efcore + psql with support for migrations backup.
+Shows how to create a code-first local db using sqlite but the same approach can applied using other backends.
 
-## quickstart
+## prepare database context
 
-- tune [appname][5] used to locate `~/.config/appname/config.json` pathfilename
+- [add nuget pkg][1] of EntityFrameworkCore.Design and for specific backend used
+- [create table as code first][2]
+- [create db context][3]
+  - [override OnConfiguring][4] where setup specific backend used
+  - [override OnModelCreating][5] where table fields can be configured ( primary keys, indexes, ... ) or seeding of initial data can be added
+  - [create a dataset][6] foreach of the table wants to be materialized on the db
 
-- create a db on target
+[1]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/skeleton-netcore-ef-code-first.csproj#L13
+[2]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Types/SampleData.cs#L3
+[3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L6
+[4]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L27
+[5]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L51
+[6]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L69
 
-- create first migration
+## managing migrations
 
-```sh
-git clone https://github.com/devel0/skeleton-netcore-ef-code-first
-cd skeleton-netcore-ef-code-first
-dotnet run
-```
+Migrations in code-first db allow team of developers to work on the same db project each with their on local db and versioning their changes through commits that includes `Migrations` folder.
 
-- tune created `~/.config/skeleton-netcore-ef-core-first/config.json` file
+The first-est migration is done by a developer and acts as an entry point for the work on that database so other developers can add their code-first changes after that commit by adding further migrations including code and `Migrations` folder changes.
 
-- execute first migration ( this will create or update tables )
+Because each migration has a timestamp in the filename there aren't conflict on these while the `Migrations/LocalDbContextModelSnapshots.cs` can be subjected to normal git conflicts in some circumnstances that can be resolved in the usual way. To reduce conflict situation, regular pulls could help.
 
-```sh
-./add-migr.sh
-```
+### first migrations
 
-- execute example
-
-```sh
-$ dotnet run -c Release
-=== ENT NAME [skeleton_netcore_ef_code_first.MigrationsBackup]
-=== ENT NAME [skeleton_netcore_ef_code_first.SampleTable]
-warn: Microsoft.EntityFrameworkCore.Model.Validation[10400]
-      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
-info: Microsoft.EntityFrameworkCore.Infrastructure[10403]
-      Entity Framework Core 5.0.2 initialized 'MyDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL' with options: SensitiveDataLoggingEnabled 
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT s.id, s.create_timestamp, s.some_data, s.update_timestamp
-      FROM sample_table AS s
-      ORDER BY s.create_timestamp DESC
-      LIMIT 1
-last created record @[17/01/2021 20:15:04] some_data=1
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (8ms) [Parameters=[@p0='2021-01-17T19:19:56.3664328Z' (DbType = DateTime), @p1='2', @p2=NULL (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
-      INSERT INTO sample_table (create_timestamp, some_data, update_timestamp)
-      VALUES (@p0, @p1, @p2)
-      RETURNING id;
-new record added : {
-  "create_timestamp": "2021-01-17T19:19:56.3664328Z",
-  "some_data": 2,
-  "id": 10,
-  "update_timestamp": null
-}
-```
-
-notes:
-- create timestamp recorded from code using [utc][1] so that db doesn't need to store timezone; it will recognized during [read][2]
-- update_timestamp will automatically updated at first record change through a [trigger][3]
-
-## manage migrations
-
-- `add-migr.sh` : create new migration from current code toward db
-- `backup-migr.sh` : automatically invoked by add-migr
-- `restore-migr.sh` : if lost `Migrations` folder a restore from autoarchived db version can be done
-
-notes:
-- do not add `Migrations` to git because other deveopers may work on other stage fo migrations on other database hosts
-- [references][4]
-
-[1]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/Program.cs#L35
-[2]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/types/SampleTable.cs#L18
-[3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/db/MyDbContext.cs#L174
-[4]: https://github.com/devel0/skeleton-netcore-ef-react-ts/blob/033a325fbc21b2e9dfd65307f88b40c7f1bab2d4/README.md#update-database-and-diagram
-[5]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/a6a0bbd6df764d48dd1a400dd2067448291709d2/Global.cs#L40
-
-## create database diagram
-
-- tune dbhost and dbname in the script
-- set auth in `~/.pgpass` like so
-
-```
-10.10.5.2:*:*:postgres:secret-pass
-```
-
-that mean to use given `secret-pass` for access when user is `postgres` for any database,port when host is `10.10.5.2`
-
-general form is
-
-```
-hostname:port:database:username:password
-```
-
-- run the tool
+Install dotnet ef migrations tools:
 
 ```sh
-./gen-db-dia.sh
+dotnet tool install --global dotnet-ef
 ```
 
-result:
-![](doc/db/db.png)
+Create initial migration:
+
+```sh
+cd skeleton-netcore-ef-core-first
+dotnet ef migrations add initial
+```
+
+Commit the initial migration ( I didn't added the initial migration for didactic purpose ).
+
+### update database
+
+Create a migration doesn't imply the code-first materialize on database, in order to do that, issue:
+
+```sh
+dotnet ef database update
+```
+
+This command can be used also to revert a migration applied by specifying a name of a migration already applied and all migrations after that one specified will be reverted returning to a state of "pending".
+
+Migrations can be removed, when are in pending state, one by one from tail using `dotnet ef migrations remove`.
+
+## run the app
+
+```sh
+dn run
+Started with 0 records
+add new one [newRecord1]
+changes: SampleData {Id: -9223372036854774807} Added
+```
+
+## migration tool summary
+
+| cmd                                       | description                                                |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `dotnet ef migrations list`               | list migrations showing which aren't yet applied (pending) |
+| `dotnet ef database update`               | apply pending migrations                                   |
+| `dotnet ef migrations add MIGRATION_NAME` | add migrations                                             |
+| `dotnet ef migrations remove`             | remove latest not yet committed migration                  |
+| `dotnet ef databse update MIGRATION_TO`   | revert applied migration                                   |
+
+## clean architecture
+
+To improve maintainability, modularity and separation of concerns in enterprise applications the *Clean architecture* should evaluated; there are many boiler plate templates available:
+
+```sh
+dotnet new search clean
+```
 
 ## how this project was built
 
 ```sh
-dotnet new console -n skeleton-netcore-ef-code-first
+dotnet new console -n skeleton-netcore-ef-code-first -f net7.0 --langVersion 11
+
 cd skeleton-netcore-ef-code-first
-dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.2
-dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL --version 5.0.1
-dotnet add package Microsoft.Extensions.Logging.Console --version 5.0.0
-dotnet add package Microsoft.Extensions.Options --version 5.0.0
-dotnet add package Newtonsoft.Json --version 12.0.3
-dotnet add package netcore-util --version 1.9.1
-dotnet add package Mono.Posix.NETStandard --version 5.20.1-preview
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 7.0.5
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 7.0.5
 ```
