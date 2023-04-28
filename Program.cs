@@ -1,47 +1,19 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using skeleton_netcore_ef_code_first;
 
-namespace skeleton_netcore_ef_code_first
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            MyDbContext.MinLogLevel = LogLevel.Information;
+// create db context
+var dbContext = new LocalDbContext(readonlyMode: false);
 
-            var global = Global.Instance;
+// query
+var cnt = dbContext.Datas.Count();
+System.Console.WriteLine($"Started with {cnt} records");
 
-            var applicationDbContextFactory = new AppDbContextFactory();
+var newRecordName = $"newRecord{++cnt}";
+System.Console.WriteLine($"add new one [{newRecordName}]");
 
-            using (var ctx = applicationDbContextFactory.CreateDbContext(args))
-            {
-                MigrationsTools.CheckMigrationsToolCmdline(args);
+// add record to the model
+dbContext.Datas.Add(new SampleData { Name = newRecordName, Value = cnt });
 
-                Global.MainStarted = true;
+System.Console.WriteLine($"changes: {dbContext.ChangeTracker.DebugView.ShortView}");
 
-                var q = ctx.SampleTables.OrderByDescending(w => w.create_timestamp).FirstOrDefault();
-
-                int nextval = 0;
-                if (q != null)
-                {
-                    System.Console.WriteLine($"last created record @[{q.create_timestamp}] some_data={q.some_data}");
-                    nextval = q.some_data + 1;
-                }
-
-                var newRecord = new SampleTable
-                {                    
-                    create_timestamp = DateTime.UtcNow,
-                    some_data = nextval
-                };
-                ctx.SampleTables.Add(newRecord);
-
-                ctx.SaveChanges();
-
-                System.Console.WriteLine($"new record added : " + JsonConvert.SerializeObject(newRecord, Formatting.Indented));
-            }
-
-        }
-    }
-}
+// save changes to db
+dbContext.SaveChanges();
