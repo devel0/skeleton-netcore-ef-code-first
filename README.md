@@ -90,7 +90,7 @@ changes: SampleData {Id: -9223372036854774807} Added
 
 ## clean architecture
 
-To improve maintainability, modularity and separation of concerns in enterprise applications the *Clean architecture* should evaluated; there are many boiler plate templates available:
+To improve maintainability, modularity and separation of concerns in enterprise applications the [Clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) should evaluated; there are many boiler plate templates available:
 
 ```sh
 dotnet new search clean
