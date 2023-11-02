@@ -1,16 +1,16 @@
 # skeleton-netcore-ef-code-first
 
-<!-- TOC -->
-* [description](#description)
-* [prepare database context](#prepare-database-context)
-* [managing migrations](#managing-migrations)
-  + [first migrations](#first-migrations)
-  + [update database](#update-database)
-* [run the app](#run-the-app)
-* [migration tool summary](#migration-tool-summary)
-* [clean architecture](#clean-architecture)
-* [how this project was built](#how-this-project-was-built)
-<!-- TOCEND -->
+- [description](#description)
+- [prepare database context](#prepare-database-context)
+- [managing migrations](#managing-migrations)
+  - [first migrations](#first-migrations)
+  - [update database](#update-database)
+- [run the app](#run-the-app)
+- [migration tool summary](#migration-tool-summary)
+- [clean architecture](#clean-architecture)
+- [how this project was built](#how-this-project-was-built)
+
+:point_right: one-to-many code first relationship example [here](https://github.com/devel0/skeleton-netcore-ef-code-first/tree/one-to-many#skeleton-netcore-ef-code-first)
 
 ## description
 
