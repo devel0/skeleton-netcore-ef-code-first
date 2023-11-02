@@ -1,99 +1,103 @@
 # skeleton-netcore-ef-code-first
 
-<!-- TOC -->
-* [description](#description)
-* [prepare database context](#prepare-database-context)
-* [managing migrations](#managing-migrations)
-  + [first migrations](#first-migrations)
-  + [update database](#update-database)
-* [run the app](#run-the-app)
-* [migration tool summary](#migration-tool-summary)
-* [clean architecture](#clean-architecture)
-* [how this project was built](#how-this-project-was-built)
-<!-- TOCEND -->
+- [description](#description)
+- [quickstart](#quickstart)
+- [expected result](#expected-result)
+- [how this project was built](#how-this-project-was-built)
 
 ## description
 
 Shows how to create a code-first local db using sqlite but the same approach can applied using other backends.
 
-## prepare database context
-
-- [add nuget pkg][1] of EntityFrameworkCore.Design and for specific backend used
-- [create table as code first][2]
-- [create db context][3]
-  - [override OnConfiguring][4] where setup specific backend used
-  - [override OnModelCreating][5] where table fields can be configured ( primary keys, indexes, ... ) or seeding of initial data can be added
-  - [create a dataset][6] foreach of the table wants to be materialized on the db
-
-[1]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/skeleton-netcore-ef-code-first.csproj#L13
-[2]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Types/SampleData.cs#L3
-[3]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L6
-[4]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L27
-[5]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L51
-[6]: https://github.com/devel0/skeleton-netcore-ef-code-first/blob/ed27b430cdb5166ac7801ee3b5b493cca64e4bf3/Data/DbContext.cs#L69
-
-## managing migrations
-
-Migrations in code-first db allow team of developers to work on the same db project each with their on local db and versioning their changes through commits that includes `Migrations` folder.
-
-The first-est migration is done by a developer and acts as an entry point for the work on that database so other developers can add their code-first changes after that commit by adding further migrations including code and `Migrations` folder changes.
-
-Because each migration has a timestamp in the filename there aren't conflict on these while the `Migrations/LocalDbContextModelSnapshots.cs` can be subjected to normal git conflicts in some circumnstances that can be resolved in the usual way. To reduce conflict situation, regular pulls could help.
-
-### first migrations
-
-Install dotnet ef migrations tools:
+## quickstart
 
 ```sh
-dotnet tool install --global dotnet-ef
-```
-
-Create initial migration:
-
-```sh
-cd skeleton-netcore-ef-core-first
-dotnet ef migrations add initial
-```
-
-Commit the initial migration ( I didn't added the initial migration for didactic purpose ).
-
-### update database
-
-Create a migration doesn't imply the code-first materialize on database, in order to do that, issue:
-
-```sh
+git clone https://github.com/devel0/skeleton-netcore-ef-code-first
+cd skeleton-netcore-ef-code-first
+git checkout one-to-many
+dotnet tool restore
 dotnet ef database update
+dotnet run
 ```
 
-This command can be used also to revert a migration applied by specifying a name of a migration already applied and all migrations after that one specified will be reverted returning to a state of "pending".
-
-Migrations can be removed, when are in pending state, one by one from tail using `dotnet ef migrations remove`.
-
-## run the app
+## expected result
 
 ```sh
-dn run
-Started with 0 records
-add new one [newRecord1]
-changes: SampleData {Id: -9223372036854774807} Added
-```
-
-## migration tool summary
-
-| cmd                                       | description                                                |
-| ----------------------------------------- | ---------------------------------------------------------- |
-| `dotnet ef migrations list`               | list migrations showing which aren't yet applied (pending) |
-| `dotnet ef database update`               | apply pending migrations                                   |
-| `dotnet ef migrations add MIGRATION_NAME` | add migrations                                             |
-| `dotnet ef migrations remove`             | remove latest not yet committed migration                  |
-| `dotnet ef databse update MIGRATION_TO`   | revert applied migration                                   |
-
-## clean architecture
-
-To improve maintainability, modularity and separation of concerns in enterprise applications the [Clean architecture](https://yoan-thirion.gitbook.io/knowledge-base/software-craftsmanship/code-katas/clean-architecture) should evaluated; there are many boiler plate templates available:
-
-```sh
-dotnet new search clean
+(local) DB> warn: 11/2/2023 22:39:19.751 CoreEventId.SensitiveDataLoggingEnabledWarning[10400] (Microsoft.EntityFrameworkCore.Infrastructure) 
+      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+(local) DB> info: 11/2/2023 22:39:20.033 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM "Posts" AS "p"
+(local) DB> info: 11/2/2023 22:39:20.177 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (2ms) [Parameters=[@p0='post1' (Nullable = false) (Size = 5)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Posts" ("Title")
+      VALUES (@p0)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.183 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='post2' (Nullable = false) (Size = 5)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Posts" ("Title")
+      VALUES (@p0)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.184 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='asp-net-core' (Nullable = false) (Size = 12)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Tags" ("Value")
+      VALUES (@p0)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.184 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='ef-core' (Nullable = false) (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Tags" ("Value")
+      VALUES (@p0)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.185 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='code-first' (Nullable = false) (Size = 10)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Tags" ("Value")
+      VALUES (@p0)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.186 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p1='1', @p2='1'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "PostTags" ("PostId", "TagId")
+      VALUES (@p1, @p2)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.186 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='2', @p1='1'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "PostTags" ("PostId", "TagId")
+      VALUES (@p0, @p1)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.186 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='2', @p1='2'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "PostTags" ("PostId", "TagId")
+      VALUES (@p0, @p1)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.186 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[@p0='2', @p1='3'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "PostTags" ("PostId", "TagId")
+      VALUES (@p0, @p1)
+      RETURNING "Id";
+(local) DB> info: 11/2/2023 22:39:20.301 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "p"."Id", "p"."Title", "t0"."Id", "t0"."PostId", "t0"."TagId", "t0"."Id0", "t0"."Value"
+      FROM "Posts" AS "p"
+      LEFT JOIN (
+          SELECT "p0"."Id", "p0"."PostId", "p0"."TagId", "t"."Id" AS "Id0", "t"."Value"
+          FROM "PostTags" AS "p0"
+          INNER JOIN "Tags" AS "t" ON "p0"."TagId" = "t"."Id"
+      ) AS "t0" ON "p"."Id" = "t0"."PostId"
+      ORDER BY "p"."Id", "t0"."Id"
+{
+  "postTitle": "post1",
+  "tags": [
+    "asp-net-core"
+  ]
+}
+{
+  "postTitle": "post2",
+  "tags": [
+    "asp-net-core",
+    "ef-core",
+    "code-first"
+  ]
+}
 ```
 
 ## how this project was built
@@ -102,6 +106,9 @@ dotnet new search clean
 dotnet new console -n skeleton-netcore-ef-code-first -f net7.0 --langVersion 11
 
 cd skeleton-netcore-ef-code-first
+dotnet new tool-manifest
+dotnet tool install dotnet-ef
 dotnet add package Microsoft.EntityFrameworkCore.Design --version 7.0.5
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 7.0.5
+dotnet ef migrations add init
 ```

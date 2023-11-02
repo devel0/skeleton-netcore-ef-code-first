@@ -29,7 +29,7 @@ public class LocalDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         // allow to analyze linq to sql translation
-        var LOG_SQL = false;
+        var LOG_SQL = true;
         if (LOG_SQL)
         {
             optionsBuilder.EnableSensitiveDataLogging();
@@ -53,19 +53,25 @@ public class LocalDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder
-            .Entity<SampleData>(
-                eb =>
-                {
-                    eb.HasKey(x => x.Id);
-                    eb.Property(x => x.Id).ValueGeneratedOnAdd();
-                    eb.HasIndex(x => x.Name);
-                    //eb.HasIndex(x => new { x.Field1, x.Field2 }).IsUnique();
-                });
-    }
+            .Entity<Post>(entity =>
+            {
+                entity.HasKey(x => x.Id);                    
+            })
 
-    /// <summary>
-    /// Data table
-    /// </summary>    
-    public DbSet<SampleData> Datas { get; set; }
+            .Entity<Tag>(entity =>
+            {
+                entity.HasKey(x => x.Id);                    
+            })
+
+            .Entity<PostTag>(entity =>
+            {
+                entity.HasKey(x => x.Id);                    
+            })
+            ;
+    }
+    
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<PostTag> PostTags { get; set; }
 
 }
