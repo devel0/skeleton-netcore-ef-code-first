@@ -16,6 +16,21 @@ namespace skeleton_netcore_ef_code_first.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
 
+            modelBuilder.Entity("PostTag", b =>
+                {
+                    b.Property<long>("PostTagsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("PostsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PostTagsId", "PostsId");
+
+                    b.HasIndex("PostsId");
+
+                    b.ToTable("PostTag");
+                });
+
             modelBuilder.Entity("skeleton_netcore_ef_code_first.Post", b =>
                 {
                     b.Property<long>("Id")
@@ -29,27 +44,6 @@ namespace skeleton_netcore_ef_code_first.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.PostTag", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("PostId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("TagId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("PostTags");
                 });
 
             modelBuilder.Entity("skeleton_netcore_ef_code_first.Tag", b =>
@@ -67,28 +61,19 @@ namespace skeleton_netcore_ef_code_first.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.PostTag", b =>
+            modelBuilder.Entity("PostTag", b =>
                 {
-                    b.HasOne("skeleton_netcore_ef_code_first.Post", "Post")
-                        .WithMany("Tags")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("skeleton_netcore_ef_code_first.Tag", "Tag")
+                    b.HasOne("skeleton_netcore_ef_code_first.Tag", null)
                         .WithMany()
-                        .HasForeignKey("TagId")
+                        .HasForeignKey("PostTagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
-
-                    b.Navigation("Tag");
-                });
-
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.Post", b =>
-                {
-                    b.Navigation("Tags");
+                    b.HasOne("skeleton_netcore_ef_code_first.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

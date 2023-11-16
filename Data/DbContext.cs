@@ -63,15 +63,15 @@ public class LocalDbContext : DbContext
                 entity.HasKey(x => x.Id);                    
             })
 
-            .Entity<PostTag>(entity =>
-            {
-                entity.HasKey(x => x.Id);                    
-            })
+            // .Entity<PostTag>(entity =>
+            // {
+            //     entity.HasKey(x => x.Id);                    
+            // })
             ;
     }
     
     public DbSet<Post> Posts { get; set; }
     public DbSet<Tag> Tags { get; set; }
-    public DbSet<PostTag> PostTags { get; set; }
+    // public DbSet<PostTag> PostTags { get; set; }
 
 }

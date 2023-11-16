@@ -7,7 +7,7 @@ public class Post
 
     public required string Title { get; set; }    
 
-    public virtual ICollection<PostTag> PostTags { get; set; }
+    public ICollection<Tag> PostTags { get; set; }
     
 
 
