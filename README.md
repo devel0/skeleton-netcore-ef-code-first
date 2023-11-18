@@ -31,21 +31,21 @@ dotnet run
 ## One (B) to One (A)
 
 ```csharp
-public class TableA_One
-{
-    [Key]
-    public int Id { get; set; }    
-    public int BObjectId { get; set; } // required foreign key (see note)
-    public TableB_One BObject { get; set; } = null!; // one ( required )
-    public string? Data { get; set; }
-}
-
 public class TableB_One
 {
     [Key]
     public int Id { get; set; }
 
     public virtual TableA_One? AObject { get; set; } // one ( optional )
+    public string? Data { get; set; }
+}
+
+public class TableA_One
+{
+    [Key]
+    public int Id { get; set; }    
+    public int BObjectId { get; set; } // required foreign key (see note)
+    public TableB_One BObject { get; set; } = null!; // one ( required )
     public string? Data { get; set; }
 }
 ```
@@ -149,19 +149,19 @@ FROM B TO A
 ## One (D) to Many (C)
 
 ```csharp
-public class TableC_Many
-{
-    [Key]
-    public int Id { get; set; }    
-    public TableD_One? DObject { get; set; } // one
-    public string? Data { get; set; }
-}
-
 public class TableD_One
 {
     [Key]
     public int Id { get; set; }
     public ICollection<TableC_Many> CObjects { get; set; } // many
+    public string? Data { get; set; }
+}
+
+public class TableC_Many
+{
+    [Key]
+    public int Id { get; set; }    
+    public TableD_One? DObject { get; set; } // one
     public string? Data { get; set; }
 }
 ```
