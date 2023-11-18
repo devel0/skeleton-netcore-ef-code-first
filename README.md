@@ -10,7 +10,7 @@
 - [clean architecture](#clean-architecture)
 - [how this project was built](#how-this-project-was-built)
 
-:point_right: one-to-many code first relationship example [here](https://github.com/devel0/skeleton-netcore-ef-code-first/tree/one-to-many#skeleton-netcore-ef-code-first)
+:point_right: one-to-one, one-to-many, many-to-many code first relationship examples [here](https://github.com/devel0/skeleton-netcore-ef-code-first/tree/one-to-many#skeleton-netcore-ef-code-first)
 
 ## description
 
