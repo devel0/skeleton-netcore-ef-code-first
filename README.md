@@ -167,33 +167,20 @@ FROM B TO A
 ## One (C) to Many (D)
 
 ```csharp
-FROM B TO A
-===========
-(local) DB> info: 11/18/2023 11:25:41.623 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
-      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT "b"."Id", "b"."Data", "a"."Id", "a"."Data"
-      FROM "BRecords" AS "b"
-      LEFT JOIN "ARecords" AS "a" ON "b"."Id" = "a"."BObjectId"
-      WHERE "a"."Id" IS NOT NULL
+public class TableC_One
 {
-  "b": {
-    "Id": 2,
-    "Data": "b2"
-  },
-  "a": {
-    "Id": 1,
-    "Data": "a1"
-  }
+    [Key]
+    public int Id { get; set; }
+    public ICollection<TableD_Many> DObjects { get; set; } // many D
+    public string? Data { get; set; }
 }
+
+public class TableD_Many
 {
-  "b": {
-    "Id": 3,
-    "Data": "b3"
-  },
-  "a": {
-    "Id": 2,
-    "Data": "a2"
-  }
+    [Key]
+    public int Id { get; set; }    
+    public TableC_One? CObject { get; set; } // one C
+    public string? Data { get; set; }
 }
 ```
 
