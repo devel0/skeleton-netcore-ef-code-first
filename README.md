@@ -2,9 +2,10 @@
 
 - [description](#description)
 - [quickstart](#quickstart)
-- [One to One](#one-to-one)
-- [One to Many](#one-to-many)
-- [Many to Many](#many-to-many)
+- [Generated db structure](#generated-db-structure)
+- [One (A) to One (B)](#one-a-to-one-b)
+- [One (C) to Many (D)](#one-c-to-many-d)
+- [Many (E) to Many (F)](#many-e-to-many-f)
 - [Test futher configs](#test-futher-configs)
 - [how this project was built](#how-this-project-was-built)
 
@@ -23,7 +24,11 @@ dotnet tool restore
 dotnet run
 ```
 
-## One to One
+## Generated db structure
+
+![](doc/generated-db-structure.png)
+
+## One (A) to One (B)
 
 ```csharp
 public class TableA_One
@@ -45,7 +50,7 @@ public class TableB_One
 }
 ```
 
-![](one-to-one.svg)
+![](doc/one-to-one.svg)
 
 note:
 - `ObjectId` specified otherwise follow compile error generates:
@@ -141,7 +146,7 @@ FROM B TO A
 }
 ```
 
-## One to Many
+## One (C) to Many (D)
 
 ```csharp
 public class TableC_Many
@@ -161,7 +166,7 @@ public class TableD_One
 }
 ```
 
-![](one-to-many.svg)
+![](doc/one-to-many.svg)
 
 ```csharp
 var d1 = new TableD_One { Data = "d1" };
@@ -271,7 +276,7 @@ FROM D TO C
 }
 ```
 
-## Many to Many
+## Many (E) to Many (F)
 
 ```csharp
 public class TableE_Many
@@ -291,7 +296,7 @@ public class TableF_Many
 } 
 ```
 
-![](many-to-many.svg)
+![](doc/many-to-many.svg)
 
 ```csharp
 var e1 = new TableE_Many { Data = "e1" };
