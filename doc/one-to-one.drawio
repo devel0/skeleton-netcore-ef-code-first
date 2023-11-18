@@ -35,7 +35,7 @@
                         </mxGeometry>
                     </mxCell>
                 </object>
-                <mxCell id="12" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="9" target="4">
+                <mxCell id="12" value="" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="9" target="4">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="9" value="a1" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#000000;fontSize=24;strokeWidth=3;" parent="1" vertex="1">
