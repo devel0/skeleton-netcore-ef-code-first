@@ -4,7 +4,7 @@ public class TableC_One
 {
     [Key]
     public int Id { get; set; }
-    public ICollection<TableD_Many> DObjects { get; set; } // C has many D
+    public List<TableD_Many> DObjects { get; set; } = new(); // C has many D
     public string? Data { get; set; }
 }
 

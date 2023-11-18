@@ -11,7 +11,7 @@ using skeleton_netcore_ef_code_first;
 namespace skeleton_netcore_ef_code_first.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    [Migration("20231118102235_init")]
+    [Migration("20231118110457_init")]
     partial class init
     {
         /// <inheritdoc />

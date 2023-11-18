@@ -13,6 +13,6 @@ public class TableB_One
 {
     [Key]
     public int Id { get; set; }
-    public virtual TableA_One? AObject { get; set; } // B has one A ( optional )
+    public TableA_One? AObject { get; set; } // B has one A ( optional )
     public string? Data { get; set; }
 }
