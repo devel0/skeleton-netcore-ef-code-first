@@ -1,17 +1,17 @@
 namespace skeleton_netcore_ef_code_first;
 
-public class TableD_One
+public class TableC_One
 {
     [Key]
     public int Id { get; set; }
-    public ICollection<TableC_Many> CObjects { get; set; } // many
+    public ICollection<TableD_Many> DObjects { get; set; } // many D
     public string? Data { get; set; }
 }
 
-public class TableC_Many
+public class TableD_Many
 {
     [Key]
     public int Id { get; set; }    
-    public TableD_One? DObject { get; set; } // one
+    public TableC_One? CObject { get; set; } // one C
     public string? Data { get; set; }
 }

@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
 namespace skeleton_netcore_ef_code_first;
 
 public class LocalDbContext : DbContext
@@ -49,30 +47,20 @@ public class LocalDbContext : DbContext
     /// <param name="modelBuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-
-        /*
-        Follow is necessary to avoid compiler error in one-to-one relationship:
-        "The dependent side could not be determined for the one-to-one relationship between 'TableA.BObject' and 'TableB.AObject'. To identify the dependent side of the relationship, configure the foreign key property. If these navigations should not be part of the same relationship, configure them independently via separate method chains in 'OnModelCreating'. See http://go.microsoft.com/fwlink/?LinkId=724062 for more details"
-        */
-        // modelBuilder.Entity<TableB>()
-        //     .HasOne(e => e.AObject)
-        //     .WithOne(e => e.BObject)
-        //     .HasForeignKey<TableA>(e => e.BObjectId)
-        //     .IsRequired();
+        base.OnModelCreating(modelBuilder);        
     }
 
     //
 
     public DbSet<TableA_One> ARecords { get; set; }
 
-    public DbSet<TableB_One> BRecords { get; set; }
+    public DbSet<TableB_One> BRecords { get; set; }    
 
     //
 
-    public DbSet<TableC_Many> CRecords { get; set; }
+    public DbSet<TableC_One> CRecords { get; set; }
 
-    public DbSet<TableD_One> DRecords { get; set; }
+    public DbSet<TableD_Many> DRecords { get; set; }    
 
     //
 

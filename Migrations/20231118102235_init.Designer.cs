@@ -11,7 +11,7 @@ using skeleton_netcore_ef_code_first;
 namespace skeleton_netcore_ef_code_first.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    [Migration("20231118093314_init")]
+    [Migration("20231118102235_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -69,35 +69,35 @@ namespace skeleton_netcore_ef_code_first.Migrations
                     b.ToTable("BRecords");
                 });
 
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableC_Many", b =>
+            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableC_One", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("DObjectId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Data")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DObjectId");
 
                     b.ToTable("CRecords");
                 });
 
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableD_One", b =>
+            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableD_Many", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CObjectId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Data")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CObjectId");
 
                     b.ToTable("DRecords");
                 });
@@ -156,13 +156,13 @@ namespace skeleton_netcore_ef_code_first.Migrations
                     b.Navigation("BObject");
                 });
 
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableC_Many", b =>
+            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableD_Many", b =>
                 {
-                    b.HasOne("skeleton_netcore_ef_code_first.TableD_One", "DObject")
-                        .WithMany("CObjects")
-                        .HasForeignKey("DObjectId");
+                    b.HasOne("skeleton_netcore_ef_code_first.TableC_One", "CObject")
+                        .WithMany("DObjects")
+                        .HasForeignKey("CObjectId");
 
-                    b.Navigation("DObject");
+                    b.Navigation("CObject");
                 });
 
             modelBuilder.Entity("skeleton_netcore_ef_code_first.TableB_One", b =>
@@ -170,9 +170,9 @@ namespace skeleton_netcore_ef_code_first.Migrations
                     b.Navigation("AObject");
                 });
 
-            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableD_One", b =>
+            modelBuilder.Entity("skeleton_netcore_ef_code_first.TableC_One", b =>
                 {
-                    b.Navigation("CObjects");
+                    b.Navigation("DObjects");
                 });
 #pragma warning restore 612, 618
         }

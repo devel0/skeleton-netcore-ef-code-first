@@ -3,8 +3,8 @@
 - [description](#description)
 - [quickstart](#quickstart)
 - [Generated db structure](#generated-db-structure)
-- [One (B) to One (A)](#one-b-to-one-a)
-- [One (D) to Many (C)](#one-d-to-many-c)
+- [One (A) to One (B)](#one-a-to-one-b)
+- [One (C) to Many (D)](#one-c-to-many-d)
 - [Many (E) to Many (F)](#many-e-to-many-f)
 - [Test futher configs](#test-futher-configs)
 - [how this project was built](#how-this-project-was-built)
@@ -28,24 +28,23 @@ dotnet run
 
 ![](doc/generated-db-structure.png)
 
-## One (B) to One (A)
+## One (A) to One (B)
 
 ```csharp
+public class TableA_One
+{
+    [Key]
+    public int Id { get; set; }
+    public int BObjectId { get; set; } // required foreign key
+    public TableB_One BObject { get; set; } = null!; // one B ( required )
+    public string? Data { get; set; }
+}
+
 public class TableB_One
 {
     [Key]
     public int Id { get; set; }
-
-    public virtual TableA_One? AObject { get; set; } // one ( optional )
-    public string? Data { get; set; }
-}
-
-public class TableA_One
-{
-    [Key]
-    public int Id { get; set; }    
-    public int BObjectId { get; set; } // required foreign key (see note)
-    public TableB_One BObject { get; set; } = null!; // one ( required )
+    public virtual TableA_One? AObject { get; set; } // one A ( optional )
     public string? Data { get; set; }
 }
 ```
@@ -53,19 +52,20 @@ public class TableA_One
 ![](doc/one-to-one.svg)
 
 note:
+
 - `ObjectId` specified otherwise follow compile error generates:
 
-*The dependent side could not be determined for the one-to-one relationship between 'TableA_One.BObject' and 'TableB_One.AObject'. To identify the dependent side of the relationship, configure the foreign key property. If these navigations should not be part of the same relationship, configure them independently via separate method chains in 'OnModelCreating'. See http://go.microsoft.com/fwlink/?LinkId=724062 for more details.*    
+_The dependent side could not be determined for the one-to-one relationship between 'TableA_One.BObject' and 'TableB_One.AObject'. To identify the dependent side of the relationship, configure the foreign key property. If these navigations should not be part of the same relationship, configure them independently via separate method chains in 'OnModelCreating'. See http://go.microsoft.com/fwlink/?LinkId=724062 for more details._
 
 ```csharp
-var b1 = new TableB_One { Data = "b1" };
-var b2 = new TableB_One { Data = "b2" };
+var a1 = new TableA_One { Data = "a1" };
+var a2 = new TableA_One { Data = "a2" };
 
-var a1 = new TableA_One { Data = "a1", BObject = b1 }; // NOTE: THIS WILL GET SKIPPED
-var a2 = new TableA_One { Data = "a2", BObject = b1 }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
-var a3 = new TableA_One { Data = "a3", BObject = b2 };
+var b1 = new TableB_One { Data = "b1", AObject = a1 }; // NOTE: THIS WILL GET SKIPPED
+var b2 = new TableB_One { Data = "b2", AObject = a1 }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
+var b3 = new TableB_One { Data = "b3", AObject = a2 };
 
-dbContext.ARecords.AddRange(new[] { a1, a2, a3 }); // NOTE: a1 "OVERWRITTEN" BY a2
+dbContext.BRecords.AddRange(new[] { b1, b2, b3 }); // NOTE: b1 "OVERWRITTEN" BY b2
 ```
 
 **from A to B**
@@ -80,7 +80,7 @@ var q = dbContext.ARecords
 ```log
 FROM A TO B
 ===========
-(local) DB> info: 11/18/2023 10:19:57.280 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:25:41.570 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "a"."Id", "a"."Data", "b"."Id", "b"."Data"
       FROM "ARecords" AS "a"
@@ -88,21 +88,21 @@ FROM A TO B
 {
   "a": {
     "Id": 1,
-    "Data": "a2"
+    "Data": "a1"
   },
   "b": {
-    "Id": 1,
-    "Data": "b1"
+    "Id": 2,
+    "Data": "b2"
   }
 }
 {
   "a": {
     "Id": 2,
-    "Data": "a3"
+    "Data": "a2"
   },
   "b": {
-    "Id": 2,
-    "Data": "b2"
+    "Id": 3,
+    "Data": "b3"
   }
 }
 ```
@@ -111,120 +111,132 @@ FROM A TO B
 
 ```csharp
 var q = dbContext.BRecords
+  .Where(x => x.AObject != null)
   .Include(x => x.AObject)
-  .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject.Id, x.AObject.Data } })
+  .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject!.Id, x.AObject.Data } })
   .ToList();
 ```
 
 ```log
 FROM B TO A
 ===========
-(local) DB> info: 11/18/2023 10:19:57.311 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:25:41.623 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "b"."Id", "b"."Data", "a"."Id", "a"."Data"
       FROM "BRecords" AS "b"
       LEFT JOIN "ARecords" AS "a" ON "b"."Id" = "a"."BObjectId"
-{
-  "b": {
-    "Id": 1,
-    "Data": "b1"
-  },
-  "a": {
-    "Id": 1,
-    "Data": "a2"
-  }
-}
+      WHERE "a"."Id" IS NOT NULL
 {
   "b": {
     "Id": 2,
     "Data": "b2"
   },
   "a": {
+    "Id": 1,
+    "Data": "a1"
+  }
+}
+{
+  "b": {
+    "Id": 3,
+    "Data": "b3"
+  },
+  "a": {
     "Id": 2,
-    "Data": "a3"
+    "Data": "a2"
   }
 }
 ```
 
-## One (D) to Many (C)
+## One (C) to Many (D)
 
 ```csharp
-public class TableD_One
+FROM B TO A
+===========
+(local) DB> info: 11/18/2023 11:25:41.623 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."Data", "a"."Id", "a"."Data"
+      FROM "BRecords" AS "b"
+      LEFT JOIN "ARecords" AS "a" ON "b"."Id" = "a"."BObjectId"
+      WHERE "a"."Id" IS NOT NULL
 {
-    [Key]
-    public int Id { get; set; }
-    public ICollection<TableC_Many> CObjects { get; set; } // many
-    public string? Data { get; set; }
+  "b": {
+    "Id": 2,
+    "Data": "b2"
+  },
+  "a": {
+    "Id": 1,
+    "Data": "a1"
+  }
 }
-
-public class TableC_Many
 {
-    [Key]
-    public int Id { get; set; }    
-    public TableD_One? DObject { get; set; } // one
-    public string? Data { get; set; }
+  "b": {
+    "Id": 3,
+    "Data": "b3"
+  },
+  "a": {
+    "Id": 2,
+    "Data": "a2"
+  }
 }
 ```
 
 ![](doc/one-to-many.svg)
 
 ```csharp
-var d1 = new TableD_One { Data = "d1" };
-var d2 = new TableD_One { Data = "d2" };
+var c1 = new TableC_One { Data = "c1" };
+var c2 = new TableC_One { Data = "c2" };
 
-var c1 = new TableC_Many { Data = "c1", DObject = d1 };
-var c2 = new TableC_Many { Data = "c2", DObject = d1 };
-var c3 = new TableC_Many { Data = "c3", DObject = d2 };
-
-dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
+var d1 = new TableD_Many { Data = "d1", CObject = c1 };
+var d2 = new TableD_Many { Data = "d2", CObject = c1 };
+var d3 = new TableD_Many { Data = "d3", CObject = c2 };
 ```
 
 **from C to D**
 
 ```csharp
- var q = dbContext.CRecords
-  .Include(x => x.DObject)
-  .Select(x => new { C = new { x.Id, x.Data }, D = new { x.DObject.Id, x.DObject.Data } })
+var q = dbContext.CRecords
+  .Include(x => x.DObjects)
+  .Select(x => new { C = new { x.Id, x.Data }, D = x.DObjects.Select(y => new { y.Id, y.Data }) })
   .ToList();
 ```
 
 ```log
 FROM C TO D
 ===========
-(local) DB> info: 11/18/2023 10:35:59.151 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:35:16.563 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "c"."Id", "c"."Data", "d"."Id", "d"."Data"
       FROM "CRecords" AS "c"
-      LEFT JOIN "DRecords" AS "d" ON "c"."DObjectId" = "d"."Id"
+      LEFT JOIN "DRecords" AS "d" ON "c"."Id" = "d"."CObjectId"
+      ORDER BY "c"."Id"
 {
   "C": {
     "Id": 1,
     "Data": "c1"
   },
-  "D": {
-    "Id": 1,
-    "Data": "d1"
-  }
+  "D": [
+    {
+      "Id": 1,
+      "Data": "d1"
+    },
+    {
+      "Id": 2,
+      "Data": "d2"
+    }
+  ]
 }
 {
   "C": {
     "Id": 2,
     "Data": "c2"
   },
-  "D": {
-    "Id": 1,
-    "Data": "d1"
-  }
-}
-{
-  "C": {
-    "Id": 3,
-    "Data": "c3"
-  },
-  "D": {
-    "Id": 2,
-    "Data": "d2"
-  }
+  "D": [
+    {
+      "Id": 3,
+      "Data": "d3"
+    }
+  ]
 }
 ```
 
@@ -232,47 +244,50 @@ FROM C TO D
 
 ```csharp
 var q = dbContext.DRecords
-  .Include(x => x.CObjects)
-  .Select(x => new { D = new { x.Id, x.Data }, C = x.CObjects.Select(y => new { y.Id, y.Data }) })
+  .Where(x => x.CObject != null)
+  .Include(x => x.CObject)
+  .Select(x => new { D = new { x.Id, x.Data }, C = new { x.CObject!.Id, x.CObject.Data } })
   .ToList();
 ```
 
 ```log
 FROM D TO C
 ===========
-(local) DB> info: 11/18/2023 10:35:59.177 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:35:16.573 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "d"."Id", "d"."Data", "c"."Id", "c"."Data"
       FROM "DRecords" AS "d"
-      LEFT JOIN "CRecords" AS "c" ON "d"."Id" = "c"."DObjectId"
-      ORDER BY "d"."Id"
+      LEFT JOIN "CRecords" AS "c" ON "d"."CObjectId" = "c"."Id"
+      WHERE "c"."Id" IS NOT NULL
 {
   "D": {
     "Id": 1,
     "Data": "d1"
   },
-  "C": [
-    {
-      "Id": 1,
-      "Data": "c1"
-    },
-    {
-      "Id": 2,
-      "Data": "c2"
-    }
-  ]
+  "C": {
+    "Id": 1,
+    "Data": "c1"
+  }
 }
 {
   "D": {
     "Id": 2,
     "Data": "d2"
   },
-  "C": [
-    {
-      "Id": 3,
-      "Data": "c3"
-    }
-  ]
+  "C": {
+    "Id": 1,
+    "Data": "c1"
+  }
+}
+{
+  "D": {
+    "Id": 3,
+    "Data": "d3"
+  },
+  "C": {
+    "Id": 2,
+    "Data": "c2"
+  }
 }
 ```
 
@@ -282,7 +297,7 @@ FROM D TO C
 public class TableE_Many
 {
     [Key]
-    public int Id { get; set; }    
+    public int Id { get; set; }
     public List<TableF_Many>? FObjects { get; set; } = new(); // many
     public string? Data { get; set; }
 }
@@ -293,7 +308,7 @@ public class TableF_Many
     public int Id { get; set; }
     public List<TableE_Many> EObjects { get; set; } = new(); // many
     public string? Data { get; set; }
-} 
+}
 ```
 
 ![](doc/many-to-many.svg)
@@ -334,7 +349,7 @@ var q = dbContext.ERecords
 ```log
 FROM E TO F
 ===========
-(local) DB> info: 11/18/2023 10:35:59.244 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:25:41.757 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "e"."Id", "e"."Data", "t0"."Id", "t0"."Data", "t0"."EObjectsId", "t0"."FObjectsId"
       FROM "ERecords" AS "e"
@@ -406,7 +421,7 @@ var q = dbContext.FRecords
 ```log
 FROM F TO E
 ===========
-(local) DB> info: 11/18/2023 10:35:59.251 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+(local) DB> info: 11/18/2023 11:25:41.765 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "f"."Id", "f"."Data", "t0"."Id", "t0"."Data", "t0"."EObjectsId", "t0"."FObjectsId"
       FROM "FRecords" AS "f"

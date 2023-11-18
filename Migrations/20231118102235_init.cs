@@ -24,7 +24,7 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DRecords",
+                name: "CRecords",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -33,7 +33,7 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DRecords", x => x.Id);
+                    table.PrimaryKey("PK_CRecords", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,21 +83,21 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CRecords",
+                name: "DRecords",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    DObjectId = table.Column<int>(type: "INTEGER", nullable: true),
+                    CObjectId = table.Column<int>(type: "INTEGER", nullable: true),
                     Data = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CRecords", x => x.Id);
+                    table.PrimaryKey("PK_DRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CRecords_DRecords_DObjectId",
-                        column: x => x.DObjectId,
-                        principalTable: "DRecords",
+                        name: "FK_DRecords_CRecords_CObjectId",
+                        column: x => x.CObjectId,
+                        principalTable: "CRecords",
                         principalColumn: "Id");
                 });
 
@@ -132,9 +132,9 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CRecords_DObjectId",
-                table: "CRecords",
-                column: "DObjectId");
+                name: "IX_DRecords_CObjectId",
+                table: "DRecords",
+                column: "CObjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TableE_ManyTableF_Many_FObjectsId",
@@ -149,7 +149,7 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 name: "ARecords");
 
             migrationBuilder.DropTable(
-                name: "CRecords");
+                name: "DRecords");
 
             migrationBuilder.DropTable(
                 name: "TableE_ManyTableF_Many");
@@ -158,7 +158,7 @@ namespace skeleton_netcore_ef_code_first.Migrations
                 name: "BRecords");
 
             migrationBuilder.DropTable(
-                name: "DRecords");
+                name: "CRecords");
 
             migrationBuilder.DropTable(
                 name: "ERecords");

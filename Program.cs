@@ -16,16 +16,16 @@
 //
 // TableA (1)---(1) TableB
 //
-if (dbContext.CRecords.Count() == 0)
+if (dbContext.DRecords.Count() == 0)
 {
-    var b1 = new TableB_One { Data = "b1" };
-    var b2 = new TableB_One { Data = "b2" };
+    var a1 = new TableA_One { Data = "a1" };
+    var a2 = new TableA_One { Data = "a2" };
 
-    var a1 = new TableA_One { Data = "a1", BObject = b1 }; // NOTE: THIS WILL GET SKIPPED
-    var a2 = new TableA_One { Data = "a2", BObject = b1  }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
-    var a3 = new TableA_One { Data = "a3", BObject = b2 };
+    var b1 = new TableB_One { Data = "b1", AObject = a1 }; // NOTE: THIS WILL GET SKIPPED
+    var b2 = new TableB_One { Data = "b2", AObject = a1 }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
+    var b3 = new TableB_One { Data = "b3", AObject = a2 };
 
-    dbContext.ARecords.AddRange(new[] { a1, a2, a3 }); // NOTE: a1 "OVERWRITTEN" BY a2
+    dbContext.BRecords.AddRange(new[] { b1, b2, b3 }); // NOTE: b1 "OVERWRITTEN" BY b2
     dbContext.SaveChanges();
 
     {
@@ -48,8 +48,9 @@ if (dbContext.CRecords.Count() == 0)
         Console.WriteLine("===========");
 
         var q = dbContext.BRecords
+            .Where(x => x.AObject != null)
             .Include(x => x.AObject)
-            .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject.Id, x.AObject.Data } })
+            .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject!.Id, x.AObject.Data } })
             .ToList();
 
         foreach (var x in q)
@@ -58,18 +59,18 @@ if (dbContext.CRecords.Count() == 0)
 }
 
 //
-// TableC (*)---(1) TableD
+// TableC (1)---(*) TableD
 //
-if (dbContext.CRecords.Count() == 0)
+if (dbContext.DRecords.Count() == 0)
 {
-    var d1 = new TableD_One { Data = "d1" };
-    var d2 = new TableD_One { Data = "d2" };
+    var c1 = new TableC_One { Data = "c1" };
+    var c2 = new TableC_One { Data = "c2" };
 
-    var c1 = new TableC_Many { Data = "c1", DObject = d1 };
-    var c2 = new TableC_Many { Data = "c2", DObject = d1 };
-    var c3 = new TableC_Many { Data = "c3", DObject = d2 };
+    var d1 = new TableD_Many { Data = "d1", CObject = c1 };
+    var d2 = new TableD_Many { Data = "d2", CObject = c1 };
+    var d3 = new TableD_Many { Data = "d3", CObject = c2 };
 
-    dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
+    dbContext.DRecords.AddRange(new[] { d1, d2, d3 });
     dbContext.SaveChanges();
 
     {
@@ -78,8 +79,8 @@ if (dbContext.CRecords.Count() == 0)
         Console.WriteLine("===========");
 
         var q = dbContext.CRecords
-            .Include(x => x.DObject)
-            .Select(x => new { C = new { x.Id, x.Data }, D = new { x.DObject.Id, x.DObject.Data } })
+            .Include(x => x.DObjects)
+            .Select(x => new { C = new { x.Id, x.Data }, D = x.DObjects.Select(y => new { y.Id, y.Data }) })
             .ToList();
 
         foreach (var x in q)
@@ -92,8 +93,9 @@ if (dbContext.CRecords.Count() == 0)
         Console.WriteLine("===========");
 
         var q = dbContext.DRecords
-            .Include(x => x.CObjects)
-            .Select(x => new { D = new { x.Id, x.Data }, C = x.CObjects.Select(y => new { y.Id, y.Data }) })
+            .Where(x => x.CObject != null)
+            .Include(x => x.CObject)
+            .Select(x => new { D = new { x.Id, x.Data }, C = new { x.CObject!.Id, x.CObject.Data } })
             .ToList();
 
         foreach (var x in q)
