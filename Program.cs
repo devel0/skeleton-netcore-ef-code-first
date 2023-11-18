@@ -21,9 +21,9 @@ if (dbContext.CRecords.Count() == 0)
     var b1 = new TableB_One { Data = "b1" };
     var b2 = new TableB_One { Data = "b2" };
 
-    var a1 = new TableA_One { BObject = b1, Data = "a1" }; // NOTE: THIS WILL GET SKIPPED
-    var a2 = new TableA_One { BObject = b1, Data = "a2" }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
-    var a3 = new TableA_One { BObject = b2, Data = "a3" };
+    var a1 = new TableA_One { Data = "a1", BObject = b1 }; // NOTE: THIS WILL GET SKIPPED
+    var a2 = new TableA_One { Data = "a2", BObject = b1  }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
+    var a3 = new TableA_One { Data = "a3", BObject = b2 };
 
     dbContext.ARecords.AddRange(new[] { a1, a2, a3 }); // NOTE: a1 "OVERWRITTEN" BY a2
     dbContext.SaveChanges();
@@ -65,9 +65,9 @@ if (dbContext.CRecords.Count() == 0)
     var d1 = new TableD_One { Data = "d1" };
     var d2 = new TableD_One { Data = "d2" };
 
-    var c1 = new TableC_Many { DObject = d1, Data = "c1" };
-    var c2 = new TableC_Many { DObject = d1, Data = "c2" };
-    var c3 = new TableC_Many { DObject = d2, Data = "c3" };
+    var c1 = new TableC_Many { Data = "c1", DObject = d1 };
+    var c2 = new TableC_Many { Data = "c2", DObject = d1 };
+    var c3 = new TableC_Many { Data = "c3", DObject = d2 };
 
     dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
     dbContext.SaveChanges();

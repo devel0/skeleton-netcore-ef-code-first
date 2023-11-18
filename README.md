@@ -56,9 +56,9 @@ note:
 var b1 = new TableB_One { Data = "b1" };
 var b2 = new TableB_One { Data = "b2" };
 
-var a1 = new TableA_One { BObject = b1, Data = "a1" }; // NOTE: THIS WILL GET SKIPPED
-var a2 = new TableA_One { BObject = b1, Data = "a2" }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
-var a3 = new TableA_One { BObject = b2, Data = "a3" };
+var a1 = new TableA_One { Data = "a1", BObject = b1 }; // NOTE: THIS WILL GET SKIPPED
+var a2 = new TableA_One { Data = "a2", BObject = b1 }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
+var a3 = new TableA_One { Data = "a3", BObject = b2 };
 
 dbContext.ARecords.AddRange(new[] { a1, a2, a3 }); // NOTE: a1 "OVERWRITTEN" BY a2
 ```
@@ -167,9 +167,9 @@ public class TableD_One
 var d1 = new TableD_One { Data = "d1" };
 var d2 = new TableD_One { Data = "d2" };
 
-var c1 = new TableC_Many { DObject = d1, Data = "c1" };
-var c2 = new TableC_Many { DObject = d1, Data = "c2" };
-var c3 = new TableC_Many { DObject = d2, Data = "c3" };
+var c1 = new TableC_Many { Data = "c1", DObject = d1 };
+var c2 = new TableC_Many { Data = "c2", DObject = d1 };
+var c3 = new TableC_Many { Data = "c3", DObject = d2 };
 
 dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
 ```
@@ -294,14 +294,23 @@ public class TableF_Many
 ![](many-to-many.svg)
 
 ```csharp
-var d1 = new TableD_One { Data = "d1" };
-var d2 = new TableD_One { Data = "d2" };
+var e1 = new TableE_Many { Data = "e1" };
+var e2 = new TableE_Many { Data = "e2" };
+var e3 = new TableE_Many { Data = "e3" };
 
-var c1 = new TableC_Many { DObject = d1, Data = "c1" };
-var c2 = new TableC_Many { DObject = d1, Data = "c2" };
-var c3 = new TableC_Many { DObject = d2, Data = "c3" };
+var f1 = new TableF_Many { Data = "f1" };
+var f2 = new TableF_Many { Data = "f2" };
+var f3 = new TableF_Many { Data = "f3" };
 
-dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
+e1.FObjects.Add(f1);
+e1.FObjects.Add(f2);
+
+e2.FObjects.Add(f3);
+
+f3.EObjects.Add(e3);
+f3.EObjects.Add(e1);
+
+dbContext.ERecords.AddRange(new[] { e1, e2, e3 });
 ```
 
 **from E to F**
