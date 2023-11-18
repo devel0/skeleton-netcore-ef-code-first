@@ -3,8 +3,8 @@
 - [description](#description)
 - [quickstart](#quickstart)
 - [Generated db structure](#generated-db-structure)
-- [One (A) to One (B)](#one-a-to-one-b)
-- [One (C) to Many (D)](#one-c-to-many-d)
+- [One (B) to One (A)](#one-b-to-one-a)
+- [One (D) to Many (C)](#one-d-to-many-c)
 - [Many (E) to Many (F)](#many-e-to-many-f)
 - [Test futher configs](#test-futher-configs)
 - [how this project was built](#how-this-project-was-built)
@@ -28,7 +28,7 @@ dotnet run
 
 ![](doc/generated-db-structure.png)
 
-## One (A) to One (B)
+## One (B) to One (A)
 
 ```csharp
 public class TableA_One
@@ -146,7 +146,7 @@ FROM B TO A
 }
 ```
 
-## One (C) to Many (D)
+## One (D) to Many (C)
 
 ```csharp
 public class TableC_Many
