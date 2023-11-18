@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace skeleton_netcore_ef_code_first;
 
@@ -52,26 +51,33 @@ public class LocalDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder
-            .Entity<Post>(entity =>
-            {
-                entity.HasKey(x => x.Id);                    
-            })
-
-            .Entity<Tag>(entity =>
-            {
-                entity.HasKey(x => x.Id);                    
-            })
-
-            // .Entity<PostTag>(entity =>
-            // {
-            //     entity.HasKey(x => x.Id);                    
-            // })
-            ;
+        /*
+        Follow is necessary to avoid compiler error in one-to-one relationship:
+        "The dependent side could not be determined for the one-to-one relationship between 'TableA.BObject' and 'TableB.AObject'. To identify the dependent side of the relationship, configure the foreign key property. If these navigations should not be part of the same relationship, configure them independently via separate method chains in 'OnModelCreating'. See http://go.microsoft.com/fwlink/?LinkId=724062 for more details"
+        */
+        // modelBuilder.Entity<TableB>()
+        //     .HasOne(e => e.AObject)
+        //     .WithOne(e => e.BObject)
+        //     .HasForeignKey<TableA>(e => e.BObjectId)
+        //     .IsRequired();
     }
-    
-    public DbSet<Post> Posts { get; set; }
-    public DbSet<Tag> Tags { get; set; }
-    // public DbSet<PostTag> PostTags { get; set; }
+
+    //
+
+    public DbSet<TableA_One> ARecords { get; set; }
+
+    public DbSet<TableB_One> BRecords { get; set; }
+
+    //
+
+    public DbSet<TableC_Many> CRecords { get; set; }
+
+    public DbSet<TableD_One> DRecords { get; set; }
+
+    //
+
+    public DbSet<TableE_Many> ERecords { get; set; }
+
+    public DbSet<TableF_Many> FRecords { get; set; }
 
 }
