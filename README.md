@@ -36,7 +36,7 @@ public class TableA_One
     [Key]
     public int Id { get; set; }
     public int BObjectId { get; set; } // required foreign key
-    public TableB_One BObject { get; set; } = null!; // one B ( required )
+    public TableB_One BObject { get; set; } = null!; // A has one B ( required )
     public string? Data { get; set; }
 }
 
@@ -44,7 +44,7 @@ public class TableB_One
 {
     [Key]
     public int Id { get; set; }
-    public virtual TableA_One? AObject { get; set; } // one A ( optional )
+    public virtual TableA_One? AObject { get; set; } // B has one A ( optional )
     public string? Data { get; set; }
 }
 ```
@@ -171,7 +171,7 @@ public class TableC_One
 {
     [Key]
     public int Id { get; set; }
-    public ICollection<TableD_Many> DObjects { get; set; } // many D
+    public ICollection<TableD_Many> DObjects { get; set; } // C has many D
     public string? Data { get; set; }
 }
 
@@ -179,7 +179,7 @@ public class TableD_Many
 {
     [Key]
     public int Id { get; set; }    
-    public TableC_One? CObject { get; set; } // one C
+    public TableC_One? CObject { get; set; } // D has one C
     public string? Data { get; set; }
 }
 ```
@@ -307,7 +307,7 @@ public class TableE_Many
 {
     [Key]
     public int Id { get; set; }
-    public List<TableF_Many>? FObjects { get; set; } = new(); // many
+    public List<TableF_Many>? FObjects { get; set; } = new(); // E has many
     public string? Data { get; set; }
 }
 
@@ -315,7 +315,7 @@ public class TableF_Many
 {
     [Key]
     public int Id { get; set; }
-    public List<TableE_Many> EObjects { get; set; } = new(); // many
+    public List<TableE_Many> EObjects { get; set; } = new(); // F has many
     public string? Data { get; set; }
 }
 ```
