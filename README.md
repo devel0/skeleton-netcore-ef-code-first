@@ -61,11 +61,11 @@ _The dependent side could not be determined for the one-to-one relationship betw
 var a1 = new TableA_One { Data = "a1" };
 var a2 = new TableA_One { Data = "a2" };
 
-var b1 = new TableB_One { Data = "b1", AObject = a1 }; // NOTE: THIS WILL GET SKIPPED
+var b1 = new TableB_One { Data = "b1", AObject = a1 }; // NOTE: AObject HERE WILL NULLIFIED
 var b2 = new TableB_One { Data = "b2", AObject = a1 }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
 var b3 = new TableB_One { Data = "b3", AObject = a2 };
 
-dbContext.BRecords.AddRange(new[] { b1, b2, b3 }); // NOTE: b1 "OVERWRITTEN" BY b2
+dbContext.BRecords.AddRange(new[] { b1, b2, b3 });
 ```
 
 **from A to B**
@@ -111,21 +111,37 @@ FROM A TO B
 
 ```csharp
 var q = dbContext.BRecords
-  .Where(x => x.AObject != null)
   .Include(x => x.AObject)
-  .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject!.Id, x.AObject.Data } })
+  .Select(x => new
+  {
+      b = new { x.Id, x.Data },
+      a = new
+      {
+          Id = x.AObject != null ? x.AObject.Id : (int?)null,
+          Data = x.AObject != null ? x.AObject.Data : null
+      }
+  })
   .ToList();
 ```
 
 ```log
 FROM B TO A
 ===========
-(local) DB> info: 11/18/2023 11:25:41.623 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
+(local) DB> info: 11/18/2023 11:47:05.376 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "b"."Id", "b"."Data", "a"."Id", "a"."Data"
       FROM "BRecords" AS "b"
       LEFT JOIN "ARecords" AS "a" ON "b"."Id" = "a"."BObjectId"
-      WHERE "a"."Id" IS NOT NULL
+{
+  "b": {
+    "Id": 1,
+    "Data": "b1"
+  },
+  "a": {
+    "Id": null,
+    "Data": null
+  }
+}
 {
   "b": {
     "Id": 2,
@@ -244,21 +260,27 @@ FROM C TO D
 
 ```csharp
 var q = dbContext.DRecords
-  .Where(x => x.CObject != null)
   .Include(x => x.CObject)
-  .Select(x => new { D = new { x.Id, x.Data }, C = new { x.CObject!.Id, x.CObject.Data } })
+  .Select(x => new
+  {
+      D = new { x.Id, x.Data },
+      C = new
+      {
+          Id = x.CObject != null ? x.CObject.Id : (int?)null,
+          Data = x.CObject != null ? x.CObject.Data : null
+      }
+  })
   .ToList();
 ```
 
 ```log
 FROM D TO C
 ===========
-(local) DB> info: 11/18/2023 11:35:16.573 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command)
+(local) DB> info: 11/18/2023 11:52:58.785 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
       Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT "d"."Id", "d"."Data", "c"."Id", "c"."Data"
       FROM "DRecords" AS "d"
       LEFT JOIN "CRecords" AS "c" ON "d"."CObjectId" = "c"."Id"
-      WHERE "c"."Id" IS NOT NULL
 {
   "D": {
     "Id": 1,

@@ -48,9 +48,16 @@ if (dbContext.DRecords.Count() == 0)
         Console.WriteLine("===========");
 
         var q = dbContext.BRecords
-            .Where(x => x.AObject != null)
             .Include(x => x.AObject)
-            .Select(x => new { b = new { x.Id, x.Data }, a = new { x.AObject!.Id, x.AObject.Data } })
+            .Select(x => new
+            {
+                b = new { x.Id, x.Data },
+                a = new
+                {
+                    Id = x.AObject != null ? x.AObject.Id : (int?)null,
+                    Data = x.AObject != null ? x.AObject.Data : null
+                }
+            })
             .ToList();
 
         foreach (var x in q)
@@ -93,9 +100,16 @@ if (dbContext.DRecords.Count() == 0)
         Console.WriteLine("===========");
 
         var q = dbContext.DRecords
-            .Where(x => x.CObject != null)
             .Include(x => x.CObject)
-            .Select(x => new { D = new { x.Id, x.Data }, C = new { x.CObject!.Id, x.CObject.Data } })
+            .Select(x => new
+            {
+                D = new { x.Id, x.Data },
+                C = new
+                {
+                    Id = x.CObject != null ? x.CObject.Id : (int?)null,
+                    Data = x.CObject != null ? x.CObject.Data : null
+                }
+            })
             .ToList();
 
         foreach (var x in q)
