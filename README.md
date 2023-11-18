@@ -52,6 +52,17 @@ note:
 
 *The dependent side could not be determined for the one-to-one relationship between 'TableA_One.BObject' and 'TableB_One.AObject'. To identify the dependent side of the relationship, configure the foreign key property. If these navigations should not be part of the same relationship, configure them independently via separate method chains in 'OnModelCreating'. See http://go.microsoft.com/fwlink/?LinkId=724062 for more details.*    
 
+```csharp
+var b1 = new TableB_One { Data = "b1" };
+var b2 = new TableB_One { Data = "b2" };
+
+var a1 = new TableA_One { BObject = b1, Data = "a1" }; // NOTE: THIS WILL GET SKIPPED
+var a2 = new TableA_One { BObject = b1, Data = "a2" }; // CAUSE THIS FURTHER ASSIGNMENT ( relation is one-to-one )
+var a3 = new TableA_One { BObject = b2, Data = "a3" };
+
+dbContext.ARecords.AddRange(new[] { a1, a2, a3 }); // NOTE: a1 "OVERWRITTEN" BY a2
+```
+
 **from A to B**
 
 ```csharp
@@ -151,6 +162,17 @@ public class TableD_One
 ```
 
 ![](one-to-many.svg)
+
+```csharp
+var d1 = new TableD_One { Data = "d1" };
+var d2 = new TableD_One { Data = "d2" };
+
+var c1 = new TableC_Many { DObject = d1, Data = "c1" };
+var c2 = new TableC_Many { DObject = d1, Data = "c2" };
+var c3 = new TableC_Many { DObject = d2, Data = "c3" };
+
+dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
+```
 
 **from C to D**
 
@@ -270,6 +292,17 @@ public class TableF_Many
 ```
 
 ![](many-to-many.svg)
+
+```csharp
+var d1 = new TableD_One { Data = "d1" };
+var d2 = new TableD_One { Data = "d2" };
+
+var c1 = new TableC_Many { DObject = d1, Data = "c1" };
+var c2 = new TableC_Many { DObject = d1, Data = "c2" };
+var c3 = new TableC_Many { DObject = d2, Data = "c3" };
+
+dbContext.CRecords.AddRange(new[] { c1, c2, c3 });
+```
 
 **from E to F**
 
